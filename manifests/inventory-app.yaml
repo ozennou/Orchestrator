@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-app
+spec:
+  selector:
+    app: inventory-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-app-deployment
+  labels:
+    app: inventory-app
+spec:
+  selector:
+    matchLabels:
+      app: inventory-app
+  template:
+    metadata:
+      labels:
+        app: inventory-app
+    spec:
+      initContainers:
+        - name: init-container
+          image: alpine:3.18
+          command: ['sh', '-c', 'until nc -z -w 3 inventory-db 5432; do echo waiting for inventory-db; sleep 5; done;']
+      containers:
+        - name: inventory-app
+          image: ozennou/inventory-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: api-secret
+                key: INVEN_DB_USER
+          - name: DB_PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: api-secret
+                key: INVEN_DB_PASSWORD
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: api-secret
+                key: INVEN_DB_NAME
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: api-secret
+                key: INVEN_DB_HOST
+          # resources:
+          #   requests:
+          #     cpu: "200m" # Specify the cpu resource to check the Horizontal scaling
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-app-deployment
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: 
+        type: Utilization
+        averageUtilization: 60
