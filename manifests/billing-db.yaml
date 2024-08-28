@@ -13,7 +13,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: billing-db-deployment
+  name: billing-db-sts
   labels:
     app: billing-db
 spec:
