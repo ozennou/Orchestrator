@@ -34,9 +34,9 @@ spec:
             - secretRef:
                 name: api-secret
             
-          # resources:
-          #   requests:
-          #     cpu: "200m" # Specify the cpu resource to check the Horizontal scaling
+          resources:
+            requests:
+              cpu: "200m" # Specify the cpu resource to check the Horizontal scaling
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
