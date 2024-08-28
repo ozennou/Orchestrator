@@ -55,9 +55,9 @@ spec:
               secretKeyRef:
                 name: api-secret
                 key: INVEN_DB_HOST
-          # resources:
-          #   requests:
-          #     cpu: "200m" # Specify the cpu resource to check the Horizontal scaling
+          resources:
+            requests:
+              cpu: "200m" # Specify the cpu resource to check the Horizontal scaling
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
