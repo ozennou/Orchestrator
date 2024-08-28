@@ -12,9 +12,7 @@ start:
 	@$S mkdir -p ./volume/inventory
 	@$S chown -R 70:70 ./volume/
 	@kubectl create secret generic api-secret --from-env-file=.env
-	@find ./manifests -name "*.yaml" -exec kubectl apply -f {} \;
-	@echo -n '	The api-gateway service Ip : '
-	@kubectl get svc | grep api-gateway | awk '{print $$3}'
+	@kubectl apply -f application.yaml 
 
 clean:
 	@find ./manifests -name "*.yaml" -exec kubectl delete -f {} \;
@@ -26,9 +24,8 @@ fclean: clean
 ip:
 	@kubectl get svc | grep api-gateway | awk '{print $$3}'
 
-argocd:
+install_argocd:
 	@kubectl create namespace argocd
 	@kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 	@echo -n 'The argocd admin password is : '
 	@kubectl get secret/argocd-initial-admin-secret -n argocd -o yaml | grep password | awk '{print $$2}' | base64 -d
-	@echo
