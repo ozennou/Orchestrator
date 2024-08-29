@@ -15,7 +15,7 @@ start:
 	@kubectl apply -f application.yaml 
 
 clean:
-	@find ./manifests -name "*.yaml" -exec kubectl delete -f {} \;
+	@kubectl delete -f application.yaml 
 	@kubectl delete secret/api-secret
 
 fclean: clean
@@ -32,3 +32,8 @@ install_argocd:
 
 argocd-server:
 	@kubectl port-forward -n argocd svc/argocd-server 8080:443
+
+argocd-passwd:
+	@echo -n 'The argocd admin password is : '
+	@kubectl get secret/argocd-initial-admin-secret -n argocd -o yaml | grep password | awk '{print $$2}' | base64 -d
+	@echo

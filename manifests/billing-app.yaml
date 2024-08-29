@@ -31,7 +31,7 @@ spec:
           command: ['sh', '-c', 'until nc -z -w 3 billing-db 5432; do echo waiting for billing-db; sleep 5; done;']
       containers:
         - name: billing-app
-          image: ozennou/billing-app:latest
+          image: ozennou/billing-app:v1.0.1
           ports:
             - containerPort: 8080
           envFrom:
